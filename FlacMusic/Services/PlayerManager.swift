@@ -60,7 +60,7 @@ final class PlayerManager: NSObject, ObservableObject {
         }
 
         NotificationCenter.default.addObserver(
-            forName: AVPlayerItemDidPlayToEndTimeNotification,
+            forName: AVPlayerItem.didPlayToEndTimeNotification,
             object: nil,
             queue: .main
         ) { [weak self] _ in
