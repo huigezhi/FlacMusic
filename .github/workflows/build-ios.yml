@@ -40,12 +40,14 @@ jobs:
       - name: Report error summary (public annotations)
         if: failure()
         run: |
+          emit() { while IFS= read -r line; do echo "::error::${line:0:280}"; done; }
           if [ -f archive.log ]; then
-            grep -E "error:" archive.log | sort -u | head -10 | while IFS= read -r line; do
-              short=$(echo "$line" | cut -c1-300)
-              echo "::error::$short"
-            done
+            grep -E "error:|Reason:" archive.log | sort -u | head -4 | emit
           fi
+          plutil -lint FlacMusic.xcodeproj/project.pbxproj 2>&1 | head -1 | emit
+          echo "DIR: $(ls FlacMusic.xcodeproj 2>&1 | tr '\n' ' ' | cut -c1-250)" | emit
+          head -3 FlacMusic.xcodeproj/project.pbxproj 2>&1 | emit
+          xcodebuild -project FlacMusic.xcodeproj -list 2>&1 | head -2 | emit
 
       - name: Pack unsigned ipa
         if: success()
