@@ -94,7 +94,7 @@ final class MusicAPI {
     func search(
         platform: MusicPlatform, keyword: String, page: Int, size: Int = 20
     ) async throws -> SearchData {
-        var result = try await call("search", params: [
+        var result: SearchData = try await call("search", params: [
             "platform": platform.rawValue,
             "keyword": keyword,
             "page": String(page),

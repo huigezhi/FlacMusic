@@ -4,6 +4,8 @@ import SwiftUI
 /// 收藏 / 歌单 / 本地索引 / 搜索历史，全部持久化在 Documents/library.json
 @MainActor
 final class LibraryStore: ObservableObject {
+    static let shared = LibraryStore()
+
     @Published private(set) var favorites: [Song] = []
     @Published private(set) var playlists: [Playlist] = []
     @Published private(set) var locals: [LocalTrack] = []
