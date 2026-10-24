@@ -2,39 +2,60 @@ name: Build iOS (unsigned ipa)
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
 
 jobs:
   build:
     runs-on: macos-14
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install XcodeGen
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: "1"
+          HOMEBREW_NO_INSTALL_CLEANUP: "1"
         run: brew install xcodegen
 
       - name: Generate Xcode project
-        run: xcodegen generate
+        run: |
+          xcodegen generate
+          echo "---- schemes ----"
+          xcodebuild -project FlacMusic.xcodeproj -list || true
 
       - name: Archive (unsigned)
         run: |
+          set -o pipefail
           xcodebuild archive \
             -project FlacMusic.xcodeproj \
             -scheme FlacMusic \
             -configuration Release \
             -destination 'generic/platform=iOS' \
-            -archivePath build/FlacMusic.xcarchive \
+            -archivePath "$PWD/build/FlacMusic.xcarchive" \
             CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGN_ENTITLEMENTS=""
+            CODE_SIGNING_REQUIRED=NO \
+            2>&1 | tee archive.log | tail -30
+
+      - name: Report error summary (public annotations)
+        if: failure()
+        run: |
+          if [ -f archive.log ]; then
+            grep -E "error:" archive.log | sort -u | head -10 | while IFS= read -r line; do
+              short=$(echo "$line" | cut -c1-300)
+              echo "::error::$short"
+            done
+          fi
 
       - name: Pack unsigned ipa
+        if: success()
         run: |
           mkdir -p Payload
           cp -R build/FlacMusic.xcarchive/Products/Applications/FlacMusic.app Payload/
           zip -qry FlacMusic-unsigned.ipa Payload
 
       - name: Upload artifact
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: FlacMusic-unsigned-ipa
