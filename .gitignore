@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+._*
+
+# Xcode
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.xcuserdatad/
+*.xcscmblueprint
+
+# XcodeGen 生成物
+*.xcodeproj
+
+# 打包产物
+Payload/
+*.ipa
+*.dSYM.zip
+
+# 系统
+Thumbs.db

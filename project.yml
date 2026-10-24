@@ -1,0 +1,26 @@
+name: FlacMusic
+options:
+  bundleIdPrefix: com.flacmusic
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+targets:
+  FlacMusic:
+    type: application
+    platform: iOS
+    sources:
+      - FlacMusic
+    info:
+      path: FlacMusic/Info.plist
+    settings:
+      base:
+        PRODUCT_NAME: FlacMusic
+        PRODUCT_BUNDLE_IDENTIFIER: com.flacmusic.local
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "5.9"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
