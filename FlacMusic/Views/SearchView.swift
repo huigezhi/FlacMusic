@@ -87,10 +87,7 @@ struct SearchView: View {
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 8)
-            .background(
-                Color(uiColor: .secondarySystemFill),
-                in: RoundedRectangle(cornerRadius: 10)
-            )
+            .glassAdaptive(in: RoundedRectangle(cornerRadius: 14))
 
             Button {
                 Task { await search(reset: true) }

@@ -83,22 +83,12 @@ struct NowPlayingView: View {
 
     private var header: some View {
         HStack {
-            Button {
+            GlassControlButton(systemImage: "chevron.down", size: 40, tint: .secondary) {
                 dismiss()
-            } label: {
-                Image(systemName: "chevron.down")
-                    .font(.title3)
-                    .foregroundStyle(.secondary)
-                    .frame(width: 44, height: 44)
             }
             Spacer()
-            Button {
+            GlassControlButton(systemImage: "list.bullet", size: 40, tint: .secondary) {
                 showQueue = true
-            } label: {
-                Image(systemName: "list.bullet")
-                    .font(.title3)
-                    .foregroundStyle(.secondary)
-                    .frame(width: 44, height: 44)
             }
         }
         .padding(.horizontal, 16)
@@ -174,76 +164,84 @@ struct NowPlayingView: View {
     }
 
     private var controls: some View {
-        HStack(spacing: 32) {
-            Button {
-                player.shuffleOn.toggle()
-            } label: {
-                Image(systemName: "shuffle")
-                    .font(.body)
-                    .foregroundStyle(player.shuffleOn ? Color.accentColor : Color.secondary)
-            }
-
-            Button {
-                player.previous()
-            } label: {
-                Image(systemName: "backward.fill")
-                    .font(.title2)
-            }
-
-            Button {
-                player.togglePlayPause()
-            } label: {
-                ZStack {
-                    Circle()
-                        .strokeBorder(lineWidth: 1.5)
-                        .frame(width: 64, height: 64)
-                    if player.buffering {
-                        ProgressView()
-                    } else {
-                        Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
-                            .font(.title)
-                            .padding(.leading, player.isPlaying ? 0 : 3)
-                    }
+        Group {
+            if #available(iOS 26.0, *) {
+                GlassEffectContainer(spacing: 24) {
+                    controlCluster
                 }
-                .foregroundStyle(.primary)
-            }
-
-            Button {
-                player.next()
-            } label: {
-                Image(systemName: "forward.fill")
-                    .font(.title2)
-            }
-
-            Button {
-                player.repeatMode = nextRepeat
-            } label: {
-                Image(systemName: player.repeatMode.icon)
-                    .font(.body)
-                    .foregroundStyle(player.repeatMode == .off ? Color.secondary : Color.accentColor)
+            } else {
+                controlCluster
             }
         }
         .padding(.top, 14)
     }
 
-    private var actions: some View {
-        HStack(spacing: 56) {
-            Button {
-                showQualityPicker = true
-            } label: {
-                Label("下载", systemImage: "square.and.arrow.down")
-                    .font(.footnote)
+    private var controlCluster: some View {
+        HStack(spacing: 18) {
+            GlassControlButton(
+                systemImage: "shuffle",
+                tint: player.shuffleOn ? .accentColor : .secondary
+            ) {
+                player.shuffleOn.toggle()
             }
+
+            GlassControlButton(systemImage: "backward.fill", font: .title3) {
+                player.previous()
+            }
+
             Button {
-                showAddToPlaylist = true
+                player.togglePlayPause()
             } label: {
-                Label("歌单", systemImage: "music.note.list")
-                    .font(.footnote)
+                Group {
+                    if player.buffering {
+                        ProgressView()
+                    } else {
+                        Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
+                            .font(.system(size: 26, weight: .semibold))
+                            .padding(.leading, player.isPlaying ? 0 : 4)
+                    }
+                }
+                .foregroundStyle(.primary)
+                .frame(width: 70, height: 70)
+            }
+            .buttonStyle(.plain)
+            .glassAdaptive(in: Circle(), interactive: true)
+
+            GlassControlButton(systemImage: "forward.fill", font: .title3) {
+                player.next()
+            }
+
+            GlassControlButton(
+                systemImage: player.repeatMode.icon,
+                tint: player.repeatMode == .off ? .secondary : .accentColor
+            ) {
+                player.repeatMode = nextRepeat
             }
         }
-        .buttonStyle(.borderless)
+    }
+
+    private var actions: some View {
+        HStack(spacing: 18) {
+            actionButton("下载", icon: "square.and.arrow.down") {
+                showQualityPicker = true
+            }
+            actionButton("歌单", icon: "music.note.list") {
+                showAddToPlaylist = true
+            }
+        }
         .disabled(player.current == nil)
-        .padding(.top, 12)
+        .padding(.top, 14)
+    }
+
+    private func actionButton(_ title: String, icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: icon)
+                .font(.footnote.weight(.medium))
+                .padding(.horizontal, 18)
+                .padding(.vertical, 10)
+        }
+        .buttonStyle(.plain)
+        .glassAdaptive(in: Capsule())
     }
 
     private var nextRepeat: RepeatMode {

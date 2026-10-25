@@ -1,5 +1,55 @@
 import SwiftUI
 
+// MARK: - Liquid Glass 兼容层
+// iOS 26+ 使用系统液态玻璃材质，iOS 16~25 自动回退为普通半透明材质
+
+extension View {
+    @ViewBuilder
+    func glassAdaptive<S: Shape>(in shape: S, interactive: Bool = false) -> some View {
+        if #available(iOS 26.0, *) {
+            if interactive {
+                self.glassEffect(.regular.interactive(), in: shape)
+            } else {
+                self.glassEffect(.regular, in: shape)
+            }
+        } else {
+            self.background(.regularMaterial, in: shape)
+        }
+    }
+
+    /// iOS 26+ 向下滚动时标签栏自动收起为玻璃胶囊
+    @ViewBuilder
+    func glassTabBehavior() -> some View {
+        if #available(iOS 26.0, *) {
+            self.tabBarMinimizeBehavior(.onScrollDown)
+        } else {
+            self
+        }
+    }
+}
+
+/// 玻璃圆形图标按钮（播放页控制区用）
+struct GlassControlButton: View {
+    let systemImage: String
+    var font: Font = .body
+    var size: CGFloat = 46
+    var tint: Color = .primary
+    let action: () -> Void
+
+    var body: some View {
+        Button {
+            action()
+        } label: {
+            Image(systemName: systemImage)
+                .font(font)
+                .foregroundStyle(tint)
+                .frame(width: size, height: size)
+        }
+        .buttonStyle(.plain)
+        .glassAdaptive(in: Circle())
+    }
+}
+
 enum URLValidator {
     /// 仅允许 http/https 的公网地址，拒绝 localhost、环回、私有与保留网段。
     static func validURL(_ string: String?) -> URL? {

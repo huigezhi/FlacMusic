@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// 常驻迷你播放条：显示在 TabBar 上方，点击进入全屏播放页
+/// 常驻迷你播放条：悬浮玻璃胶囊，显示在 TabBar 上方，点击进入全屏播放页
 struct MiniPlayerBar: View {
     @Binding var showPlayer: Bool
     @EnvironmentObject private var player: PlayerManager
@@ -57,7 +57,7 @@ struct MiniPlayerBar: View {
                 .buttonStyle(.plain)
             }
             .padding(.horizontal, 14)
-            .padding(.top, 8)
+            .padding(.top, 10)
 
             GeometryReader { proxy in
                 ZStack(alignment: .leading) {
@@ -70,9 +70,12 @@ struct MiniPlayerBar: View {
                 }
             }
             .frame(height: 2)
-            .padding(.top, 6)
-            .padding(.bottom, 6)
+            .padding(.top, 8)
+            .padding(.bottom, 8)
+            .padding(.horizontal, 14)
         }
-        .background(.regularMaterial)
+        .glassAdaptive(in: RoundedRectangle(cornerRadius: 24))
+        .padding(.horizontal, 8)
+        .padding(.bottom, 2)
     }
 }

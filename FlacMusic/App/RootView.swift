@@ -23,6 +23,7 @@ struct RootView: View {
                 .withMiniPlayer(showPlayer: $showPlayer)
                 .tabItem { Label("播放列表", systemImage: "music.note.list") }
         }
+        .glassTabBehavior()
         .fullScreenCover(isPresented: $showPlayer) {
             NowPlayingView()
         }
